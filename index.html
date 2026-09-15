@@ -16,16 +16,12 @@
   html,body{height:100%}
   body{background:#14110d;color:var(--ink);font-family:Manrope,sans-serif;overflow:hidden;-webkit-font-smoothing:antialiased}
 
-  /* ---------- сцена ---------- */
-  /* видео больше не является фоном: его рисует Three.js теми же
-     формулами, что и аксессуары — рассинхрон исключён */
   #stage{position:fixed;inset:0}
   #cam{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
   #gl{position:absolute;inset:0;width:100%;height:100%;z-index:1}
   #vignette{position:absolute;inset:0;z-index:2;pointer-events:none;box-shadow:inset 0 0 120px rgba(12,9,6,.28)}
   #flash{position:absolute;inset:0;z-index:3;background:#fff;opacity:0;pointer-events:none}
 
-  /* ---------- верхняя плашка ---------- */
   #topbar{position:absolute;top:0;left:0;right:0;z-index:5;display:flex;justify-content:space-between;align-items:flex-start;padding:16px 18px;pointer-events:none}
   .brand{background:var(--paper);border:1.5px solid var(--ink);box-shadow:4px 4px 0 var(--ink);padding:9px 14px 8px}
   .brand b{display:block;font-family:Unbounded;font-weight:700;font-size:12px;letter-spacing:.14em;text-transform:uppercase}
@@ -35,11 +31,9 @@
   #status.on .dot{background:var(--accent);animation:none}
   @keyframes blink{50%{opacity:.25}}
 
-  /* ---------- подсказка ---------- */
   #hint{position:absolute;left:50%;bottom:150px;transform:translateX(-50%) translateY(8px);z-index:5;background:var(--ink);color:var(--paper);padding:10px 18px;font-size:12.5px;font-weight:700;letter-spacing:.04em;opacity:0;transition:.3s;pointer-events:none;box-shadow:4px 4px 0 rgba(29,23,18,.4);text-align:center;max-width:86vw}
   #hint.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
-  /* ---------- нижняя панель ---------- */
   #hud{position:absolute;left:0;right:0;bottom:0;z-index:6;display:flex;align-items:flex-end;justify-content:center;gap:14px;padding:16px;flex-wrap:wrap}
   .dock{background:var(--paper);border:1.5px solid var(--ink);box-shadow:6px 6px 0 rgba(18,13,9,.88);display:flex;align-items:stretch;max-width:100%}
   .cats{display:flex;flex-direction:column;border-right:1.5px solid var(--ink)}
@@ -72,7 +66,6 @@
   #shotBtn{width:76px;height:76px;background:var(--accent);color:var(--paper)}
   #shotBtn svg{width:30px;height:30px}
 
-  /* ---------- полароид ---------- */
   #shot{position:fixed;right:26px;bottom:26px;z-index:20;width:min(330px,80vw);background:#fbf6ea;border:1.5px solid var(--ink);box-shadow:10px 10px 0 rgba(18,13,9,.85);padding:13px 13px 0;opacity:0;transform:translateY(26px) rotate(5deg);pointer-events:none;transition:opacity .35s,transform .45s cubic-bezier(.2,1.4,.4,1)}
   #shot.show{opacity:1;transform:translateY(0) rotate(-2deg);pointer-events:auto}
   #shot img{width:100%;display:block;border:1.5px solid var(--ink)}
@@ -83,12 +76,10 @@
   .sbtn:hover{background:var(--accent)}
   .sbtn svg{width:16px;height:16px}
 
-  /* ---------- тосты ---------- */
   #toasts{position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:40;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none}
   .toast{background:var(--ink);color:var(--paper);padding:10px 18px;font-size:12.5px;font-weight:700;box-shadow:4px 4px 0 rgba(18,13,9,.4);animation:tin .25s;text-align:center;max-width:88vw}
   @keyframes tin{from{opacity:0;transform:translateY(-8px)}}
 
-  /* ---------- стартовый экран ---------- */
   #boot{position:fixed;inset:0;z-index:30;background:var(--paper);display:grid;place-items:center;padding:24px;overflow-y:auto}
   #boot::after{content:'';position:absolute;inset:13px;border:1.5px solid var(--ink);pointer-events:none}
   #boot::before{content:'';position:absolute;inset:19px;border:1px solid var(--ink);opacity:.35;pointer-events:none}
@@ -106,11 +97,10 @@
   #startBtn svg{width:19px;height:19px}
   #startBtn:hover{transform:translate(-2px,-2px);box-shadow:8px 8px 0 #cbbd9e}
   #startBtn:disabled{opacity:.6;cursor:wait}
-  #bootMsg{margin-top:16px;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;opacity:.5;min-height:14px}
+  #bootMsg{margin-top:16px;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;opacity:.5;min-height:14px;max-width:560px;margin-left:auto;margin-right:auto}
   #bootMsg.err{color:#a32c14;opacity:1}
   .fine{margin-top:20px;font-size:11px;font-weight:600;opacity:.45}
 
-  /* ---------- карточка помощи с камерой ---------- */
   #permHelp{display:none;text-align:left;margin:0 auto 20px;max-width:560px;background:var(--paper2);border:1.5px solid var(--ink);padding:16px 18px;box-shadow:5px 5px 0 rgba(29,23,18,.28)}
   #permHelp.show{display:block}
   .ph-title{font-family:Unbounded;font-weight:700;font-size:12.5px;letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;color:var(--accent)}
@@ -258,6 +248,28 @@
   </div>
 </div>
 
+<script>
+  /* Ранний перехват ошибок: любой сбой виден на стартовом экране,
+     а не превращается в «кнопка молчит». Должен регистрироваться
+     до загрузки основного модуля. */
+  (function(){
+    function showErr(text){
+      if (window.__bootDone) return;                 // после старта не пугаем пользователя
+      var el = document.getElementById('bootMsg');
+      if (!el) return;
+      el.classList.add('err');
+      el.textContent = ('сбой: ' + text).slice(0, 160);
+    }
+    window.addEventListener('error', function(e){
+      showErr((e && e.message) || 'неизвестная ошибка скрипта');
+    });
+    window.addEventListener('unhandledrejection', function(e){
+      var r = e && e.reason;
+      showErr((r && (r.message || r)) || 'ошибка promise');
+    });
+  })();
+</script>
+
 <script type="importmap">
 { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }
 </script>
@@ -269,7 +281,7 @@ import { FilesetResolver, FaceLandmarker } from 'https://cdn.jsdelivr.net/npm/@m
 /* ============================================================
    БАЗА: сцена, камера, свет
    Единица измерения — «юнит лица»: полуширина лица = 100.
-   Важно: 1 юнит сцены = 1 CSS-пиксель экрана (на плоскости z=0).
+   1 юнит сцены = 1 CSS-пиксель экрана (на плоскости z=0).
 ============================================================ */
 const video   = document.getElementById('cam');
 const glCanvas= document.getElementById('gl');
@@ -301,20 +313,27 @@ scene.add(new THREE.HemisphereLight(0xfff5e4, 0x4a3c2c, 1.05));
 const key = new THREE.DirectionalLight(0xffffff, 1.7); key.position.set(0.7, 1.1, 1.2); scene.add(key);
 const fill = new THREE.DirectionalLight(0xffe6c8, 0.5); fill.position.set(-1, -0.2, 0.6); scene.add(fill);
 
+/* Контейнер-«голова». ОБЪЯВЛЯЕТСЯ ДО слотов — в прошлой версии он
+   стоял ниже по коду, модуль падал с ReferenceError и кнопка
+   камеры не реагировала вовсе. */
+const head = new THREE.Group();
+head.visible = false;
+scene.add(head);
+
 /* ============================================================
    ВИДЕО-ФОН ВНУТРИ СЦЕНЫ
    Кадр камеры рисуется плоскостью в той же системе координат,
    что и аксессуары, — теми же формулами cover и зеркала.
-   Поэтому точка лица из MediaPipe и её пиксель на фоне
-   совпадают по построению, на любом устройстве.
+   Точка лица из MediaPipe и её пиксель на фоне совпадают
+   по построению, на любом устройстве.
 ============================================================ */
 const videoTex = new THREE.VideoTexture(video);
-videoTex.colorSpace = THREE.NoColorSpace;      // пиксели видео проходят без перекраски
+videoTex.colorSpace = THREE.NoColorSpace;      // пиксели видео идут в шейдер как есть
 videoTex.minFilter = THREE.LinearFilter;
 videoTex.magFilter = THREE.LinearFilter;
 videoTex.generateMipmaps = false;
 
-const BG_Z = -800;                              // глубоко позади лица, ничего не перекрывает
+const BG_Z = -800;                              // глубоко позади лица
 const bgUniforms = {
   map:   { value: videoTex },
   uCrop: { value: new THREE.Vector4(1, 1, 0, 0) }, // fracU, fracV, offU, offV (cover-кроп)
@@ -331,7 +350,7 @@ const bgMesh = new THREE.Mesh(
       uniform sampler2D map; uniform vec4 uCrop; varying vec2 vUv;
       void main(){
         vec2 uv = vUv * uCrop.xy + uCrop.zw;
-        uv.x = 1.0 - uv.x;                       // зеркало селфи, как раньше
+        uv.x = 1.0 - uv.x;                       // зеркало селфи
         gl_FragColor = texture2D(map, uv);
       }`
   })
@@ -346,8 +365,8 @@ function updateBg(){
   const has = started && vw > 0 && vh > 0;
   bgMesh.visible = has;
   if (!has) return;
-  const d = CAMERA_D - BG_Z;                    // расстояние камера → плоскость фона
-  const visH = d * H / CAMERA_D;                // видимая высота на этой глубине
+  const d = CAMERA_D - BG_Z;
+  const visH = d * H / CAMERA_D;
   bgMesh.scale.set(visH * (W/H), visH, 1);
   const sa = W/H, va = vw/vh;
   const fu = Math.min(1, sa/va), fv = Math.min(1, va/sa);
@@ -621,6 +640,7 @@ const DEFILE = ITEMS.map(i => i.id);
 const MODEL_CACHE = {};
 const getModel = it => MODEL_CACHE[it.id] || (MODEL_CACHE[it.id] = it.build());
 
+/* слоты — head уже объявлен выше */
 const slots = {};
 for (const c of CATS){
   const g = new THREE.Group();
@@ -629,11 +649,6 @@ for (const c of CATS){
   slots[c.id] = { group:g, item:null, attached:null, s:0, sv:0 };
 }
 const slotList = Object.values(slots);
-
-/* контейнер-«голова» */
-const head = new THREE.Group();
-head.visible = false;
-scene.add(head);
 
 /* ============================================================
    Трекинг лица
@@ -657,14 +672,13 @@ async function initTracker(){
 }
 
 /* Точка лица → координаты сцены.
-   Те же cover-кроп и зеркало, что и у видео-фона в шейдере,
-   поэтому аксессуар всегда попадает ровно в точку лица на кадре.
-   Сцена: x вправо, y вверх, центр экрана = (0,0). */
+   Те же cover-кроп и зеркало, что и у видео-фона в шейдере:
+   центр экрана = (0,0), x вправо, y вверх. */
 function worldOf(i, out){
   const l = lm[i];
   const vw = video.videoWidth || 1, vh = video.videoHeight || 1;
   const k = Math.max(W/vw, H/vh), dw = vw*k, dh = vh*k;
-  const px = (W - dw)/2 + l.x*dw;              // пиксель на «нес зеркален» кадре
+  const px = (W - dw)/2 + l.x*dw;
   const py = (H - dh)/2 + l.y*dh;
   return out.set(W/2 - px, H/2 - py, -(l.z || 0) * dw);
 }
@@ -874,8 +888,7 @@ defileBtn.onclick = () => {
 };
 
 /* ============================================================
-   Снимок: теперь весь кадр (видео + аксессуары) живёт
-   в одном WebGL-канвасе — снимаем напрямую с него
+   Снимок: весь кадр (видео + аксессуары) в одном WebGL-канвасе
 ============================================================ */
 const flashEl = document.getElementById('flash');
 const shotEl = document.getElementById('shot');
@@ -1004,6 +1017,17 @@ const HELP = {
     ]),
     note: () => 'Нужен установленный Python (python.org). Имя этой страницы уже вшито в ссылку лаунчера.'
   },
+  webview: {
+    title: () => 'Этот браузер не отдаёт камеру',
+    text: () => 'Страница открыта во встроенном браузере другого приложения (WebView) — у него нет доступа к камере. Откройте ссылку в обычном Safari или Chrome.',
+    dl: false, cmd: false,
+    steps: () => [
+      'Скопируйте адрес страницы.',
+      'Вставьте его в Safari (iPhone) или Chrome.',
+      'Нажмите «Включить камеру» и разрешите доступ.'
+    ],
+    note: () => null
+  },
   denied: {
     title: () => 'Браузер запомнил отказ — и больше не спрашивает',
     text: () => 'Камеру для этого сайта ранее запретили, поэтому запрос не появляется. Снимаем запрет за десять секунд:',
@@ -1073,8 +1097,8 @@ document.getElementById('phCopy').onclick = async () => {
 };
 
 function camProblemKind(){
-  if (!apiOk) return 'nolocal';
-  if (isFile && !onLocal) return 'nolocal';
+  if (isFile) return 'nolocal';
+  if (!apiOk) return insecure ? 'nolocal' : 'webview';
   if (insecure && !onLocal) return 'nolocal';
   return null;
 }
@@ -1100,7 +1124,7 @@ function handleCamError(err){
   const n = (err && err.name) || '';
   bootMsg.classList.add('err');
   if (n === 'NotAllowedError' || n === 'PermissionDeniedError' || n === 'SecurityError'){
-    if (isFile && !onLocal){
+    if (isFile){
       bootMsg.textContent = 'запрос не показан: chrome запрещает камеру на file://';
       showCard('nolocal');
     } else {
@@ -1120,7 +1144,7 @@ function handleCamError(err){
 }
 
 document.getElementById('phRetry').onclick = async () => {
-  if (!apiOk){ showCard('nolocal'); return; }
+  if (!apiOk){ showCard(camProblemKind() || 'nolocal'); return; }
   try {
     const s = await navigator.mediaDevices.getUserMedia({ video:true });
     s.getTracks().forEach(t => t.stop());
@@ -1141,7 +1165,7 @@ document.getElementById('phRetry').onclick = async () => {
 })();
 
 /* ============================================================
-   Старт: запрос камеры по клику + параллельная загрузка модели
+   Старт: запрос камеры по клику + загрузка модели
 ============================================================ */
 let trackerReady = false;
 
@@ -1150,7 +1174,8 @@ initTracker()
   .catch(() => { bootMsg.textContent = 'не удалось загрузить модель — проверьте интернет'; bootMsg.classList.add('err'); });
 
 startBtn.onclick = async () => {
-  if (!apiOk){ showCard('nolocal'); startBtn.disabled = false; return; }
+  const problem = camProblemKind();
+  if (problem){ showCard(problem); startBtn.disabled = false; return; }
   startBtn.disabled = true;
   bootMsg.classList.remove('err');
   bootMsg.textContent = 'запрос появится у адресной строки — нажмите «Разрешить»';
@@ -1172,6 +1197,7 @@ startBtn.onclick = async () => {
   video.srcObject = stream;
   try { await video.play(); } catch(e){}
   started = true;
+  window.__bootDone = true;                 // дальше ошибки не выводим на стартовый экран
   lastSeen = performance.now();
   document.getElementById('boot').style.display = 'none';
   toast('Камера включена — смотрите в объектив');
